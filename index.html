@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <title>Redirect url in Javascript</title> 
+</head> 
+<body> 
+<script>
+	var extra = ""; 
+	if(String(window.location.href).includes("github.io")){
+		extra = "/stoichiometrytutor";
+	}
+    var url= extra + "/HTML/stoich%20tutor.html?question_file=../CognitiveModel/problem1.nools"; 
+    window.location = url; 
+</script> 
+</body> 
+</html>
