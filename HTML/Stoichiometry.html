@@ -1,0 +1,619 @@
+<!-- improvement:
+- avoid arbitrary order restriction
+- groups
+- answer range -->
+
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<title>Stoich Tutor</title>
+
+	<link rel="stylesheet" type="text/css" href="https://cdn.ctat.cs.cmu.edu/releases/latest/CTAT.css">
+	<link rel="stylesheet" type="text/css" href="Assets/tutor.css">
+
+	<script src="https://cdn.ctat.cs.cmu.edu/releases/latest/jquery.min.js"></script>
+    <script src="https://cdn.ctat.cs.cmu.edu/releases/beta/ctat.min.js"></script>
+    <script src="https://cdn.ctat.cs.cmu.edu/releases/beta/ctatloader.js"></script>
+	<script src="https://cdn.ctat.cs.cmu.edu/releases/beta/nools.js"></script>
+</head>
+
+<body>
+	<main class="CTATTutor">
+		<h3>Tutor</h3>
+
+		<section class="CTATProblemSolving">
+			<h3>Problem Solving</h3>
+			<section class="CTATProblem">
+				<header>
+					<h1>Problem</h1>
+					<p>Stoichiometry</p>
+				</header>
+				<div id="problemstatement" class="CTATTextField" contenteditable="false"></div>
+				<div class="question-image">
+				</div>
+			</section>
+
+			<section id="solution" class="CTATSolution">
+				<header>
+					<h1>Solution</h1>
+					<p>Generate solution steps with feedback from the tutor.</p>
+				</header>
+
+
+				<!-- information given -->
+				<div class="grid-container">
+
+					<div class="CTATGroupingComponent grid-item" id="information">
+						<div class="flex grid-item">
+							<p> 
+								<span id="given-value" class="CTATComboBox" tabindex="0">
+									<option>----</option>
+									<option>Given Value</option>
+									<option>Unit Conversion</option>
+									<option>Avogadro's Number</option>
+									<option>Molecular Weight</option>
+									<option>Composition Stoichiometry</option>
+									<option>Solution Concentration</option>
+									<option>Desired Result</option>
+								</span>
+							</p>
+						</div>
+						<h1></h1>
+						<div id="initial-quantity" class="CTATTextField" contenteditable="false"></div>
+
+					</div>
+
+				</div>
+				<div><br><br></div>
+
+
+					<!-- Step 3: Unit Conversion -->
+					<div id="step3" class="CTATGroupingComponent">
+						<div class="flex grid-item">
+							<p>Next: 
+								<span id="step3-combo" class="CTATComboBox" tabindex="0">
+									<option>----</option>
+									<option>Given Value</option>
+									<option>Unit Conversion</option>
+									<option>Avogadro's Number</option>
+									<option>Molecular Weight</option>
+									<option>Composition Stoichiometry</option>
+									<option>Solution Concentration</option>
+									<option>Desired Result</option>
+								</span>
+							</p>
+						</div>
+
+						<div class="flex1">
+
+
+
+							<div class="flex1-item">
+								<div class="numerator">
+									<div class="CTATTextInput"	id="initial-value-numerator" tabindex="6"></div>
+									<!-- <span>
+										<div id="step3-1-numerator-unit" class="CTATComboBox" tabindex="7">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+
+										</div>
+										<div id="step3-1-numerator-substance" class="CTATComboBox" tabindex="8">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+								<div class="denominator">
+									<div id="stpe3-1-denominator" class="CTATTextInput" tabindex="9"></div>
+									<!-- <span>
+										<div id="step3-1-denominator-unit" class="CTATComboBox" tabindex="10">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+										</div>
+										<div id="step3-1-denominator-substance" class="CTATComboBox" tabindex="11">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+							</div>
+
+							<div class="flex1-symbol">X</div>
+
+							<div class="flex1-item">
+								<div class="numerator">
+									<div class="CTATTextInput"	id="step3-2-numerator" tabindex="12"></div>
+									<!-- <span>
+										<div id="step3-2-numerator-unit" class="CTATComboBox" tabindex="13">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+										</div>
+										<div id="step3-2-numerator-substance" class="CTATComboBox" tabindex="14">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+								<div class="denominator">
+									<div id="step3-2-denominator" class="CTATTextInput" tabindex="15"></div>
+									<!-- <span>
+										<div id="step3-2-denominator-unit" class="CTATComboBox" tabindex="16">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+										</div>
+										<div id="step3-2-denominator-substance" class="CTATComboBox" tabindex="17">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+							</div>
+
+							<div class="flex1-symbol">=</div>
+
+							<div class="flex1-item">
+								<div class="numerator">
+									<div class="CTATTextInput"	id="step3-3-numerator" tabindex="18"></div>
+									<!-- <span>
+										<div id="step3-3-numerator-unit" class="CTATComboBox" tabindex="19">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+										</div>
+										<div id="step3-3-numerator-substance" class="CTATComboBox" tabindex="20">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+								<div class="denominator">
+									<div id="step3-3-denominator" class="CTATTextInput" tabindex="21"></div>
+									<!-- <span>
+										<div id="step3-3-denominator-unit" class="CTATComboBox" tabindex="22">
+											<option>----</option>
+											<option>atoms</option>
+											<option>cm3</option>
+											<option>fl oz</option>
+											<option>g</option>
+											<option>gal</option>
+											<option>kg</option>
+											<option>kL</option>
+											<option>km3</option>
+											<option>L</option>
+											<option>lb</option>
+											<option>mg</option>
+											<option>mL</option>
+											<option>mmol</option>
+											<option>mol</option>
+											<option>molecules</option>
+											<option>$</option>
+											<option>ug</option>
+										</div>
+										<div id="step3-3-denominator-substance" class="CTATComboBox" tabindex="23">
+											<option>----</option>
+											<option>As</option>
+											<option>asprin</option>
+											<option>AsO2-</option>
+											<option>Ba</option>
+											<option>blood</option>
+											<option>C</option>
+											<option>Canadian</option>
+											<option>C6H12O6</option>
+											<option>C2H6</option>
+											<option>CCl4</option>
+											<option>CI</option>
+											<option>COH4</option>
+											<option>coke</option>
+											<option>ethanol</option>
+											<option>Fe</option>
+											<option>FeCl2</option>
+											<option>Fe2O3</option>
+											<option>fertilizer</option>
+											<option>furan</option>
+											<option>H</option>
+											<option>H2</option>
+											<option>H2O</option>
+											<option>hemoglobin</option>
+											<option>KCl</option>
+											<option>MgSO4</option>
+											<option>milk</option>
+											<option>Na+</option>
+											<option>Na3PO4</option>
+											<option>NaCl</option>
+											<option>NH3</option>
+											<option>O2</option>
+											<option>O</option>
+											<option>P4O10</option>
+											<option>petrol</option>
+											<option>potatoes</option>
+											<option>sea water</option>
+											<option>solution</option>
+											<option>splenda</option>
+											<option>syrup</option>
+											<option>U.S.</option>
+											<option>YBa2Cu3O7</option>
+										</div>
+									</span> -->
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+
+					<div><br><br></div>
+
+
+
+
+					<!-- Step 2: Desired Result -->
+					<div id="step2" class="CTATGroupingComponent">
+						<div class="flex grid-item">
+							<p id="step2">
+								<span id="desired-result" class="CTATComboBox" tabindex="24">
+									<option>----</option>
+									<option>Given Value</option>
+									<option>Unit Conversion</option>
+									<option>Avogadro's Number</option>
+									<option>Molecular Weight</option>
+									<option>Composition Stoichiometry</option>
+									<option>Solution Concentration</option>
+									<option>Desired Result</option>
+								</span>
+							</p>
+						</div>
+
+						<div class="flex1">
+
+							<div class="flex1-item" id="final1">
+								<!-- <div class="numerator">
+									<div class="CTATTextInput"	id="step2-1-numerator" tabindex="25"></div>
+									
+								</div>
+								<div class="denominator">
+									<div id="step2-1-denominator" class="CTATTextInput" tabindex="28"></div>
+								</div> -->
+							</div>
+
+							<!-- <div class="flex1-symbol" id="final2">X</div> -->
+							<div class="flex1-item" id="final3">
+								<!-- <div class="numerator">
+									<div class="CTATTextInput"	id="step2-2-numerator" tabindex="31"></div>
+									
+								</div>
+								<div class="denominator">
+									<div id="step2-2-denominator" class="CTATTextInput" tabindex="34"></div>
+									
+								</div> -->
+							</div> 
+
+							<div class="flex1-symbol">=</div>
+
+							<div class="flex1-item" id="final_result_unit">
+								<div class="numerator">
+									<!-- <div class="CTATTextInput inline"	id="result-numerator-quantity" tabindex="15"></div> -->
+									<div class="CTATTextInput inline"	id="result-numerator" tabindex="15"></div>
+									
+								</div>
+								<div class="denominator">
+									<!-- <div id="result-denominator-quantity" class="CTATTextInput" tabindex="37"></div> -->
+									<div id="step2-3-denominator" class="CTATTextInput" tabindex="37"></div>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			
+			</section>
+		</section>
+
+		<section class="CTATTools">
+			<h3>Tools</h3>
+			<section>
+				<header>
+					<h2>Hints</h2>
+					<p>Request and read hints to help you learn.</p>
+				</header>
+				<div>
+					<div class="CTATButtons">
+						<div class="CTATHintButton"></div>
+						<div class="CTATDoneButton"></div>
+					</div>
+					<div class="CTATHintWindow">
+					</div>
+				</div>
+			</section>
+			<!-- <section>
+				<header>
+					<h2>Skills</h2>
+					<p>Watch your skills grow as you solve tutor problems.</p>
+				</header>
+				<div class="CTATSkillWindow">
+				</div>
+			</section> -->
+		</section>
+
+	</main>
+</body>
+</html>

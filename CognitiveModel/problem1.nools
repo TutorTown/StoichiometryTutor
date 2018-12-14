@@ -1,0 +1,12 @@
+import("productionrules.nools");
+
+global statement = "Let's convert a substance that is in milligrams to grams.  We'll calculate the number of grams (g) that are in 10.6 milligrams (mg) of wood alcohol (COH4). Our result should have 3 significant figures.";
+global quantity = "10.6 mg COH4";
+
+global result = ["0.0106 g COH4", ""];
+
+global unit_numerator = "g";
+global unit_denominator = "mg";
+global ratio_nums = [1,1000];
+
+global strategies = ["Unit Conversion"];

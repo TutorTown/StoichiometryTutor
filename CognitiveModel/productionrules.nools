@@ -1,0 +1,476 @@
+import("types.nools");
+
+// RULE bootstrap
+// Always fired at startup for initialization of working memory
+
+rule bootstrap {
+    when {
+        s: Boolean s === false from false;
+    }
+    then {
+
+        assert(new InterfaceElement("given-value"));
+        assert(new InterfaceElement("desired-result"));
+
+        let res_numerator = assert(new InterfaceElement("result-numerator"));
+        let res_denominator = assert(new InterfaceElement("res_denominator"));
+
+
+        let step_unit_conversion = assert(new InterfaceElement("step3-combo"));
+        let unit_conversion_numerator = assert(new InterfaceElement("step3-2-numerator"));
+        let unit_conversion_denominator = assert(new InterfaceElement("step3-2-denominator"));
+        let result_numerator = assert(new InterfaceElement("step3-3-numerator"));
+        let result_denominator = assert(new InterfaceElement("step3-3-denominator"));
+
+        assert(new Ratio("g-mg",ratio_nums[0], unit_numerator, ratio_nums[1], unit_denominator));
+
+        // // should this be storing just the names of the interface elements?
+        assert(new Result("result", result[0], result[1]));
+
+        // create the main Problem fact, with the given numberToSquare and the component names
+        assert(new Problem(strategies, [res_numerator.name, res_denominator.name]));
+
+
+
+        assert(new TPA("problemstatement", "UpdateTextField", statement));
+        assert(new TPA("initial-quantity", "UpdateTextField", quantity));
+
+        // handling dynamic interface
+        assert(new TPA("step2", "SetVisible", false));
+        assert(new TPA("step3", "SetVisible", false));
+
+        setProblemAttribute("use_backtracking", true);
+        halt();
+    }
+}
+
+// RULE selectStrategy
+// IF we have a subgoal of selectStrategy
+//     AND the given-value has not been input yet
+// THEN change the combobox to given value
+
+// could be more flexble and supporting adaptive strategy selection in the future
+
+rule selectStrategy {
+	when {
+		p: Problem p.subgoal === "selectStrategy";
+		ie: InterfaceElement ie.name === "given-value" && !ie.value {name: selection};
+	}
+	then {
+
+        assert(new Hint("Here you are given a quantity-unit-substance combination to start with. What can be chosen from the ComboBox to represent this step?"));
+        assert(new Hint("Please select Given Value for this step."));
+
+		console.log(selection);
+		if(checkSAI({selection: selection, action: "UpdateComboBox", input: "Given Value"})) {
+			// console.log("correct");
+            modify(p, "subgoal", "identifyResult");
+            assert(new TPA("step2", "SetVisible", true));
+            assert(new TPA("result-numerator-quantity", "SetVisible", false));
+            assert(new TPA("result-denominator-quantity", "SetVisible", false));
+            assert(new TPA("step2-3-denominator", "SetVisible", false));
+		} else {
+            backtrack();
+        }
+        console.log("subgoal: ", p.subgoal);
+		halt();
+	}
+}
+
+
+// RULE enter desired result 
+// IF we have a subgoal of identifyResult
+// AND the result has not been selected yet
+// THEN select Desired result in the combobox
+
+rule identifyResult {
+    when {
+        p: Problem p.subgoal === "identifyResult";
+        ie: InterfaceElement ie.name === "desired-result" && !ie.value {name: selection};
+    }
+    then {
+        assert(new Hint(""));
+
+        if (checkSAI({selection: selection, action: "UpdateComboBox", input: "Desired Result"})) {
+            modify(p, "subgoal", "enterResultUnitSubstance");
+        } else {
+            backtrack();
+        }
+        halt();
+    }
+}
+
+// enter correct unit
+// IF there is a subgoal of enterResultUnitSubstance
+// and the unit and substance of the desired result have not been entered yet
+// THEN input the unit and substance
+
+rule enterResultUnit {
+    when {
+        p: Problem p.subgoal === "enterResultUnitSubstance" {results: results};
+        ie: InterfaceElement ie.name === results[0] && !ie.value {name: selection};
+        res: Result res.numerator !== "" {numerator: numerator, denominator: denominator};
+    }
+    then {
+        // console.log(numerator);
+        if (checkSAI({selection: selection, action: "UpdateTextField", input: numerator}, 
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+                let unit = re.exec(sysSAI.input);
+                unit = unit[2] + " " + unit[3];
+
+                console.log(unit);
+
+                return stuSAI.input === unit;
+            }
+            )) {
+            console.log("evaluating");
+            modify(p, "subgoal", "unitConversion");
+
+            assert(new TPA("step3", "SetVisible", true));
+            assert(new TPA("step3-1-denominator", "SetVisible", false));
+            assert(new TPA("initial-value-numerator", "UpdateTextField", "10.6 mg COH4"));
+        } else {
+            backtrack();
+        }
+        halt();
+    }
+}
+
+
+// RULE selectStrategyUnitConversion
+// IF there is a subgoal of unitConversion
+// and the combobox hasn't been entered yet
+// THEN input unit conversion in the combobox
+
+// could be integrated into select strategy in the future
+rule selectStrategyUnitConversion {
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-combo" && !ie.value {name: selection};
+    }
+    then {
+        console.log("selecting strtegy for unit conversion");
+        if(checkSAI({selection: selection, action: "UpdateComboBox", input: "Unit Conversion"})) {
+            console.log("selected unit conversion");
+        } else {
+            backtrack();
+        }
+
+        halt();
+    }
+}
+
+
+    
+// RULE unitConversionNumeratorQuantity
+// IF we have a subgoal of unitConversion
+// AND the numerator quantity unit combination has not been entered yet
+// THEN enter the quantity unit combination
+
+rule unitConversionNumeratorQuantity {
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-2-numerator" && !ie.value {name: selection};
+        ratio: Ratio {numerator_quantity: nq, numerator_unit: nu};
+        sv: StudentValues sv.selection === selection {input: input}
+    }
+    then {
+
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: input})) {
+            console.log("going to evaluate unit");
+        }
+
+    }
+}
+
+rule unitConversionNumeratorUnit {
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-2-numerator" && !ie.value {name: selection};
+        ratio: Ratio {numerator_quantity: nq, numerator_unit: nu};
+    }
+    then {
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: nu},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                // console.log("stuSAI", )
+
+                let stu_input = re.exec(stuSAI.input);
+                let stu_unit = stu_input[2];
+                // let sys_input = re.exec(sysSAI.input);
+                // let sys_unit = sys_input[2];
+
+                // console.log(stu_unit === sys_unit);
+                // console.log(sys_unit);
+
+                return stu_unit === nu;
+        })) {
+            console.log("evaluating unit");
+        } else {
+            setSuccessOrBugMsg("Wrong Unit.");
+            backtrack();
+            halt(); // important
+        }
+        halt();
+    }
+}
+
+
+
+// rule unitConversionDenominatorQuantity[unit]
+// IF we have a subgoal of unitConversion
+// AND the denominator quantity unit combination has not been entered yet
+// THEN enter the quantity unit combination
+
+
+rule unitConversionDenominatorQuantity {
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-2-denominator" && !ie.value {name: selection};
+        ratio: Ratio {numerator_quantity: nq, denominator_quantity: dq};
+        svn: StudentValues svn.selection === "step3-2-numerator" {input: inputn};
+        svd: StudentValues svd.selection === "step3-2-denominator" {input: inputd};
+        // ie: InterfaceElement ie.name === 
+    }
+    then {
+        // console.log(ratio[0]+ ' ' +ratio[1]);
+
+        console.log("rule unitConversionNumeratorQuantity");
+        // console.log(svn.input);
+
+        
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: inputd},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                // console.log("stuSAI", )
+                let numerator = re.exec(inputn);
+                let snq = numerator[1];
+
+                let denominator = re.exec(inputd);
+                let sdq = denominator[1];
+                console.log(numerator);
+
+
+                console.log( snq/sdq=== nq/dq);
+                // console.log(sys_unit);
+
+                return snq/sdq === nq/dq || snq/sdq === dq/nq ;
+        })) {
+            console.log("evaluating ratio quantity");
+        } else {
+            setSuccessOrBugMsg("Wrong Quantity");
+            backtrack();
+            halt(); // important
+        }
+
+    }
+}
+
+
+// buggy rule buggyInverseRatio
+
+rule buggyInverseRatio {
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-2-denominator" {name: selection};
+        ratio: Ratio {numerator_quantity: nq, denominator_quantity: dq};
+        svn: StudentValues svn.selection === "step3-2-numerator" {input: inputn};
+        svd: StudentValues svd.selection === "step3-2-denominator" {input: inputd};
+    }
+    then {
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: inputd},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                // console.log("stuSAI", )
+                let numerator = re.exec(inputn);
+                let snq = numerator[1];
+
+                let denominator = re.exec(inputd);
+                let sdq = denominator[1];
+                console.log(numerator);
+                if(snq/sdq === dq/nq) {
+                    return false;
+                };
+                // console.log(sys_unit);
+
+                return true;
+        })) {
+            
+            console.log("evaluating ratio quantity");
+        } else {         
+            setSuccessOrBugMsg("Oops, seems you have inserted the unit the other way around");
+            assert(new TPA("step3-2-numerator", "UpdateTextField", "1g"));
+            backtrack();
+            halt(); // important
+        }
+    }
+}
+
+
+
+rule unitConversionDenominatorUnit {
+    salience: -5;
+    when {
+        p: Problem p.subgoal === "unitConversion";
+        ie: InterfaceElement ie.name === "step3-2-denominator" && !ie.value {name: selection};
+        ratio: Ratio {denominator_unit: du};
+        svd: StudentValues svd.selection === "step3-2-denominator" {input: inputd};
+    }
+    then {
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: inputd},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                let denominator = re.exec(inputd);
+                let s_unit = denominator[2];
+                return s_unit === du;
+        })) {
+            console.log("done evaluating unit");
+            modify(p,"subgoal","enterResult");
+            halt();
+
+        } else {
+            setSuccessOrBugMsg("Wrong Unit.");
+            backtrack();
+            halt(); // important
+        }
+    }
+}
+
+
+// RULE enterResultNumerator[Quantity, Unit, Substance]
+// IF we have a subgoal of enterResult
+    // AND result hasn't been entered yet
+    // AND there is a result type whose numerator is not empty
+// THEN
+    // input result quantity unit and substance
+
+
+rule enterResultNumeratorQuantity {
+    when {
+        p: Problem p.subgoal === "enterResult";
+        ie: InterfaceElement ie.name === "step3-3-numerator" && !ie.value {name: selection};
+        res: Result res.numerator !== "" {numerator: numerator, denominator: denominator};
+        
+    }
+    then {
+
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: numerator},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                let stu_input = re.exec(stuSAI.input);
+                let stu_quantity = algEval(stu_input[1]);
+                let sys_input = re.exec(sysSAI.input);
+                let sys_quantity = algEval(sys_input[1]);
+
+                console.log(stu_input);
+                console.log(stu_quantity);
+                console.log(sys_quantity);
+
+                return stu_quantity === sys_quantity;
+            })) {
+
+                console.log("evaluating result numerator quantity");
+                
+            } else {
+                backtrack();
+                halt();
+            }
+            
+        // halt();
+
+        
+    }
+}
+
+rule enterResultNumeratorUnit {
+    salience: -1;
+    when {
+        p: Problem p.subgoal === "enterResult";
+        ie: InterfaceElement ie.name === "step3-3-numerator" && !ie.value {name: selection};
+        res: Result res.numerator !== "" {numerator: numerator, denominator: denominator};
+    }
+    then {
+
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: numerator},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                // console.log("stuSAI", )
+
+                let stu_input = re.exec(stuSAI.input);
+                let stu_unit = stu_input[2];
+                let sys_input = re.exec(sysSAI.input);
+                let sys_unit = sys_input[2];
+
+                console.log(stu_unit === sys_unit);
+                // console.log(sys_unit);
+
+                return stu_unit === sys_unit;
+            })) {
+            console.log("evaluating unit");
+            } else {
+                setSuccessOrBugMsg("Wrong Unit.");
+                backtrack();
+                halt(); // important
+            }
+        // halt();
+
+    }
+}
+
+rule enterResultNumeratorSubstance {
+    salience: -1;
+    when {
+        p: Problem p.subgoal === "enterResult";
+        ie: InterfaceElement ie.name === "step3-3-numerator" && !ie.value {name: selection};
+        res: Result res.numerator !== "" {numerator: numerator, denominator: denominator};
+    }
+    then {
+
+        if(checkSAI({selection: selection, action: "UpdateTextField", input: numerator},
+            function(stuSAI, sysSAI) {
+                var re=/ *([-0-9.]+) *([a-z][^ ]*)? *([a-z][^ ]*)? */i;
+
+                let stu_input = re.exec(stuSAI.input);
+                let stu_substance = stu_input[3];
+                let sys_input = re.exec(sysSAI.input);
+                let sys_substance = sys_input[3];
+
+                console.log(stu_substance);
+
+                return stu_substance === sys_substance;
+            })) {
+            console.log("evaluating substance");
+            modify(p,"subgoal", "done");
+            setSuccessOrBugMsg("Congratulations! You have completed the problem! In this problem we practiced the Unit Conversion strategy. Please click done to start a new challenge!");
+
+            } else {
+                setSuccessOrBugMsg("Wrong substance.");
+                backtrack();
+            }
+        halt();
+
+    }
+}
+
+
+rule done {
+    when {
+        p: Problem p.subgoal === "done";
+    }
+    then {
+        if(checkSAI({selection: "done", action: "ButtonPressed", input: -1})) {
+            setSuccessOrBugMsg("Congratulations! You have completed this problem.");
+        } else {
+            backtrack();
+        }
+    }
+}
+
+
