@@ -10,6 +10,7 @@ html, body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 12px;
   width: 80%;
+  margin: 10px auto;
 }
 header {
   flex: none;
